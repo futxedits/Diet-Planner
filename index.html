@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diet Planner</title>
+    <style>
+      input,
+      select,
+      textarea,
+      button {
+        width: 100%;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 10px;
+        }
+
+        input,
+        select,
+        textarea,
+        button {
+          font-size: 14px;
+          padding: 8px;
+        }
+
+        h1 {
+          font-size: 24px;
+        }
+      }
+
+      .container {
+        max-width: 500px;
+        margin: auto;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #F1E3D3;
+      }
+      .container {
+        max-width: 500px;
+        margin: auto;
+        background: #D88C9A;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      input,
+      select,
+      textarea,
+      button {
+        width: 100%;
+        margin: 10px 0;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      button {
+        background-color: #28a745;
+        color: white;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #218838;
+      }
+      .result {
+        margin-top: 20px;
+        padding: 10px;
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Diet Maintenance Planner</h1>
+      <form id="dietForm">
+        <input
+          type="number"
+          name="currentWeight"
+          placeholder="Current Weight (kg)"
+          required
+        />
+        <input
+          type="number"
+          name="targetWeight"
+          placeholder="Target Weight (kg)"
+          required
+        />
+        <input
+          type="number"
+          name="timeframe"
+          placeholder="Timeframe (weeks)"
+          required
+        />
+        <select name="activityLevel">
+          <option value="sedentary">Sedentary</option>
+          <option value="light">Light</option>
+          <option value="moderate">Moderate</option>
+          <option value="high">High</option>
+        </select>
+        <textarea
+          name="meals"
+          rows="4"
+          placeholder="List your daily meals separated by commas"
+          required
+        ></textarea>
+        <button type="submit">Calculate Plan</button>
+      </form>
+      <div id="result" class="result" style="display: none"></div>
+    </div>
+
+    <script>
+      const form = document.getElementById("dietForm");
+      const resultDiv = document.getElementById("result");
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const currentWeight = parseFloat(form.currentWeight.value);
+        const targetWeight = parseFloat(form.targetWeight.value);
+        const timeframe = parseInt(form.timeframe.value);
+        const activityLevel = form.activityLevel.value;
+        const meals = form.meals.value.split(",").map((m) => m.trim());
+
+        const weightChange = targetWeight - currentWeight;
+        const totalCalories = weightChange * 7700;
+        const days = timeframe * 7;
+        const dailyAdjustment = totalCalories / days;
+
+        const BMR = 10 * currentWeight + 6.25 * 170 - 5 * 25 + 5; // Example: height=170cm, age=25
+        const activityMultiplier = {
+          sedentary: 1.2,
+          light: 1.375,
+          moderate: 1.55,
+          high: 1.725,
+        }[activityLevel];
+
+        const TDEE = BMR * activityMultiplier;
+        const targetCalories = Math.round(TDEE + dailyAdjustment);
+
+        let plan = `To reach your goal in ${timeframe} week(s), you need about ${targetCalories} kcal/day.\n\nSuggested Adjusted Diet:`;
+        const caloriesPerMeal = Math.round(targetCalories / meals.length);
+        meals.forEach((meal, index) => {
+          plan += `\nMeal ${
+            index + 1
+          }: ${meal} (approx. ${caloriesPerMeal} kcal)`;
+        });
+
+        resultDiv.style.display = "block";
+        resultDiv.textContent = plan;
+      });
+    </script>
+  </body>
+</html>
